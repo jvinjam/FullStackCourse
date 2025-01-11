@@ -1,17 +1,35 @@
 import { useState } from 'react'
 
-const Header = ({title}) => <h1>{title}</h1>
+const Header = ({ title }) => <h1>{title}</h1>
 
-const Button = ({onClick, label}) => <button onClick={onClick}>{label}</button>
+const Button = ({ onClick, label }) => <button onClick={onClick}>{label}</button>
 
-const Display = ({label, counter}) => <div>{label} {counter}</div>
+const Display = ({ label, counter }) => <div>{label} {counter}</div>
 
-const Statistics = ({total, avg, positive}) => {
+const Statistics = ({ good, neutral, bad }) => {
+  const total = good + neutral + bad
+
+  if (total > 0) {
+    const average = (good * 1 + neutral * 0 + bad * -1) / total
+    const positive = (good / total) * 100
+
+    return (
+      <>
+        <Header title='statistics' />
+        <Display label='good' counter={good} />
+        <Display label='neutral' counter={neutral} />
+        <Display label='bad' counter={bad} />
+        <div>all {total}</div>
+        <div>average {average}</div>
+        <div>positive {positive} %</div>
+      </>
+    )
+  }
+
   return (
     <>
-      <div>all {total}</div>
-      <div>average {avg}</div>
-      <div>positive {positive} %</div>
+      <Header title='statistics' />
+      <h4>No feedback given</h4>
     </>
   )
 }
@@ -25,10 +43,6 @@ const App = () => {
   const addGood = () => setGood(prevGood => prevGood + 1)
   const addNeutral = () => setNeutral(prevNeutral => prevNeutral + 1)
   const addBad = () => setBad(prevBad => prevBad + 1)
-  
-  const total = good + neutral + bad
-  const average = total > 0 ? (good * 1 + neutral * 0 + bad * -1) / total : 0
-  const positive = total > 0 ? (good/total) * 100 : 0
 
   return (
     <div>
@@ -36,11 +50,7 @@ const App = () => {
       <Button onClick={addGood} label='good' />
       <Button onClick={addNeutral} label='neutral' />
       <Button onClick={addBad} label='bad' />
-      <Header title='statistics' />
-      <Display label='good' counter={good} />
-      <Display label='neutral' counter={neutral} />
-      <Display label='bad' counter={bad} />
-      <Statistics total={total} avg={average} positive={positive} />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
