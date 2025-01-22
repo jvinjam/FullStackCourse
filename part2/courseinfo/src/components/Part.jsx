@@ -1,3 +1,3 @@
-const Part = ({ part }) => <p><strong>{part.name} {part.exercises > 0 ? part.exercises : ''} </strong></p>
+const Part = ({ part }) => <p>{part.name} {part.exercises > 0 ? part.exercises : ''} </p>
 
 export default Part

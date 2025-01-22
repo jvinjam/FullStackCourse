@@ -1,4 +1,5 @@
 import Content from "./Content"
+import Total from "./Total"
 
 const Header = ({ coursename }) => <h1>{coursename}</h1>
 
@@ -7,6 +8,7 @@ const Course = ({ course }) => {
         <div>
             <Header coursename={course.name} />
             <Content parts={course.parts} />
+            <Total parts={course.parts} />
         </div>
     )
 }
