@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import personService from './services/persons'
 
 const Filter = ({ searchStr, handleMethod }) => <div>filter shown with <input value={searchStr} onChange={handleMethod} /></div>
 
@@ -13,8 +13,9 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons')
-      .then(response => setPersons(response.data))
+    personService.getAll()
+      .then(initialData => setPersons(initialData))
+      .catch(error => alert('error: ', error))
   }, [])
 
   const handleNewPerson = (event) => setNewName(event.target.value)
@@ -33,7 +34,14 @@ const App = () => {
       return
     }
     if (newName.length > 0 && newNumber.length > 0) {
-      setPersons(persons.concat({ name: newName, number: newNumber }))
+      const newObj = {
+        name: newName,
+        number: newNumber
+      }
+
+      personService.create(newObj)
+        .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
+        .catch(error => alert('error: ', error))
       setNewName('')
       setNewNumber('')
     }
