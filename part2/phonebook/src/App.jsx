@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
+import Person from './components/Person'
 import personService from './services/persons'
 
 const Filter = ({ searchStr, handleMethod }) => <div>filter shown with <input value={searchStr} onChange={handleMethod} /></div>
@@ -15,7 +15,7 @@ const App = () => {
   useEffect(() => {
     personService.getAll()
       .then(initialData => setPersons(initialData))
-      .catch(error => alert('error: ', error))
+      .catch(error => console.log('error : ', error.response.statusText))
   }, [])
 
   const handleNewPerson = (event) => setNewName(event.target.value)
@@ -41,9 +41,17 @@ const App = () => {
 
       personService.create(newObj)
         .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
-        .catch(error => alert('error: ', error))
+        .catch(error => console.log('error : ', error.response.statusText))
       setNewName('')
       setNewNumber('')
+    }
+  }
+
+  const deletePerson = (person) => {
+    if (confirm(`Delete ${person.name}?`)) {
+      personService.deleteById(person.id)
+        .then(deletedPerson => setPersons(persons.filter(p => p.id != deletedPerson.id)))
+        .catch(error => console.log('error : ', error.response.statusText))
     }
   }
 
@@ -55,7 +63,10 @@ const App = () => {
       <PersonForm addPerson={addPerson} newName={newName} handleNewPerson={handleNewPerson} newNumber={newNumber}
         handleNewNumber={handleNewNumber} />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <div>
+        {filteredPersons.map(person => <Person key={person.name} person={person}
+          deletePerson={() => deletePerson(person)} />)}
+      </div>
     </div>
   )
 }
