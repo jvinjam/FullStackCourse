@@ -32,9 +32,6 @@ const App = () => {
     countries.filter(country => country.name.common.toLowerCase().includes(filter.toLowerCase()))
     : countries
 
-  if (filteredCountries !== null && filteredCountries.length < 10)
-    console.log("filteredCountries length", filteredCountries)
-
   return (
     <div>
       <div>
