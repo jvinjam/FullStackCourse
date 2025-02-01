@@ -9,17 +9,10 @@ import './App.css'
 //component for search
 const Filter = ({ searchStr, handleMethod }) => <div>filter shown with <input value={searchStr} onChange={handleMethod} /></div>
 
-const Notification = ({ isError, message }) => {
-  if (message === null || message.length == 0) {
-    return null
-  }
-
-  return (
-    <div className={isError ? 'error' : 'notification'} >
-      {message}
-    </div >
-  )
-}
+const Notification = ({ isError, message }) =>
+  <div className={isError ? 'error' : 'notification'} >
+    {message}
+  </div >
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -35,7 +28,7 @@ const App = () => {
       .catch(error => {
         //console.log('error : ', error.response.statusText)
         setErrorMessage({ isError: true, message: error.response.statusText })
-        setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
+        clearMessage()
       })
   }, [])
 
@@ -47,22 +40,28 @@ const App = () => {
   const filteredPersons = filter.length > 0 ? persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
     : persons
 
+  //Set timeout and clear error/notification message state
+  const clearMessage = () => setTimeout(() => setErrorMessage({ isError: false, message: null }), 3000)
+
   //add button function  
   const addPerson = (event) => {
     event.preventDefault()
+    //if number field is empty, alert the user and return
+    if (newName.length === 0) {
+      alert('Please enter a name.')
+      return
+    } else if (newNumber.length === 0) {
+      alert('Please enter the number.')
+      return
+    }
+
     //check if person name exists on the server
     const pObj = persons.find(p => p.name === newName)
     //if name exists and newNumber is same as current number, alert the user and return
     if (pObj !== undefined && pObj.number === newNumber) {
-      alert(`${newName} is already added to phonebook`)
+      alert(`${newName} with ${newNumber} is already added to phonebook`)
     } else if (pObj !== undefined && pObj.number !== newNumber) {
-      //if name exists and a newNumber is entered
-      //if number field is empty, alert the user and return
-      if (newNumber.length == 0) {
-        alert('Please enter the number.')
-        return
-      }
-      //ask the user for confirmation to change the entry on the server
+      //if name exists and a newNumber is entered, ask the user for confirmation to change the entry on the server
       if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         //update if user confirms, if not clear the fields and return
         const updatedObj = { ...pObj, number: newNumber }
@@ -79,12 +78,12 @@ const App = () => {
       personService.create(newObj)
         .then(returnedPerson => {
           setErrorMessage({ isError: false, message: `Added ${returnedPerson.name}` })
-          setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
-          setPersons(persons.concat(returnedPerson))
+          clearMessage()
+          setPersons(persons.concat(returnedPerson))  //re-render with new data
         })
         .catch(error => {
           setErrorMessage({ isError: true, message: error.response.statusText })
-          setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
+          clearMessage()
         })
     }
     setNewName('')
@@ -95,13 +94,13 @@ const App = () => {
     personService.update(id, personObj)
       .then(returnedPerson => {
         setErrorMessage({ isError: false, message: `Phone number updated for ${returnedPerson.name}` })
-        setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
-        setPersons(persons.map(p => p.id == returnedPerson.id ? returnedPerson : p))
+        clearMessage()
+        setPersons(persons.map(p => p.id === returnedPerson.id ? returnedPerson : p))
       })
       .catch(error => {
         setErrorMessage({ isError: true, message: `Information for ${personObj.name} was not found` })
-        setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
-        setPersons(persons.filter(p => p.id != personObj.id))
+        clearMessage()
+        setPersons(persons.filter(p => p.id !== personObj.id))
       })
   }
 
@@ -110,13 +109,13 @@ const App = () => {
       personService.deleteById(person.id)
         .then(deletedPerson => {
           setErrorMessage({ isError: false, message: `Deleted ${deletedPerson.name}` })
-          setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
-          setPersons(persons.filter(p => p.id != deletedPerson.id))
+          clearMessage()
+          setPersons(persons.filter(p => p.id !== deletedPerson.id))
         })
         .catch(error => {
           setErrorMessage({ isError: true, message: `Information of ${person.name} has already been removed from server` })
-          setTimeout(() => setErrorMessage({ isError: false, message: null }), 5000)
-          setPersons(persons.filter(p => p.id != person.id))
+          clearMessage()
+          setPersons(persons.filter(p => p.id !== person.id))
         })
     }
   }
@@ -124,7 +123,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification isError={errorMessage.isError} message={errorMessage.message} />
+      {errorMessage.message !== null && errorMessage.message.length > 0 &&
+        <Notification isError={errorMessage.isError} message={errorMessage.message} />}
       <Filter searchStr={filter} handleMethod={handleFilter} />
       <h3>Add a new</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNewPerson={handleNewPerson} newNumber={newNumber}
