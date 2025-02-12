@@ -19,7 +19,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [errorMessage, setErrorMessage] = useState({ isError: true, message: '' })
+  const [errorMessage, setErrorMessage] = useState({ isError: false, message: '' })
 
   //fetch initial data
   useEffect(() => {
