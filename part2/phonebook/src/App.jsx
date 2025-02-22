@@ -30,14 +30,12 @@ const App = () => {
   //fetch initial data
   useEffect(() => {
     //debugger;
-    personService
-      .getAll()
-      .then((initialData) => setPersons(initialData))
-      .catch((error) => {
-        console.log("Error fetching initial data: ", error.response.statusText);
-        setErrorMessage({ isError: true, message: error.response.statusText });
-        clearMessage();
-      });
+    personService.getAll().then((initialData) => setPersons(initialData));
+    // .catch((error) => {
+    //   console.log("Error fetching initial data: ", error.response.statusText);
+    //   setErrorMessage({ isError: true, message: error.response.statusText });
+    //   clearMessage();
+    // });
   }, []);
 
   const handleNewPerson = (event) => setNewName(event.target.value);
@@ -59,15 +57,6 @@ const App = () => {
   //add button function
   const addPerson = (event) => {
     event.preventDefault();
-    //if number field is empty, alert the user and return
-    if (newName.length === 0) {
-      alert("Please enter a name.");
-      return;
-    } else if (newNumber.length === 0) {
-      alert("Please enter the number.");
-      return;
-    }
-
     //check if person name exists on the server
     const pObj = persons.find((p) => p.name === newName);
     if (pObj !== undefined) {
@@ -91,9 +80,10 @@ const App = () => {
           setPersons(persons.concat(returnedPerson)); //re-render with new data
         })
         .catch((error) => {
+          console.log("Error adding new person : ", error.response.data.error);
           setErrorMessage({
             isError: true,
-            message: error.response.statusText,
+            message: error.response.data.error,
           });
           clearMessage();
         });
@@ -131,13 +121,19 @@ const App = () => {
             )
           );
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log(
+            "Error updating ",
+            updatedObj.name,
+            ": ",
+            error.response.data.error
+          );
           setErrorMessage({
             isError: true,
-            message: `Information for ${personObj.name} was not found`,
+            message: error.response.data.error,
           });
           clearMessage();
-          setPersons(persons.filter((p) => p.id !== personObj.id));
+          //setPersons(persons.filter((p) => p.id !== personObj.id));
         });
     }
   };
@@ -151,17 +147,15 @@ const App = () => {
             isError: false,
             message: `Deleted ${person.name}`,
           });
-          clearMessage();
-          setPersons(persons.filter((p) => p.id !== person.id));
         })
         .catch(() => {
           setErrorMessage({
             isError: true,
             message: `Information of ${person.name} has already been removed from server`,
           });
-          clearMessage();
-          setPersons(persons.filter((p) => p.id !== person.id));
         });
+      clearMessage();
+      setPersons(persons.filter((p) => p.id !== person.id));
     }
   };
 
