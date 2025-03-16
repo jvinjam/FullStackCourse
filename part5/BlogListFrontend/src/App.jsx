@@ -6,7 +6,6 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 import "./App.css";
-import Togglable from "./components/Togglable";
 
 const Notification = ({ notification }) => {
   const { message, isError } = notification;
@@ -93,7 +92,7 @@ const App = () => {
       setBlogs(blogs.concat(savedBlog))
       notifyUser(`A new blog ${savedBlog.title} by ${savedBlog.author} added`)
     }
-    setNewBlogVisible(!newBlogVisible)
+    setNewBlogVisible(false)
   };
 
   const createNewBlogForm = () => {
@@ -103,11 +102,11 @@ const App = () => {
     return (
       <div>
         <div style={hideWhenVisible}>
-          <button onClick={() => setNewBlogVisible(!newBlogVisible)}>New blog</button>
+          <button onClick={() => setNewBlogVisible(true)}>New blog</button>
         </div>
         <div style={showWhenVisible}>
         <NewBlog createNewBlog={createNewBlog} />
-        <button onClick={() => setNewBlogVisible(!newBlogVisible)}>Cancel</button>
+        <button onClick={() => setNewBlogVisible(false)}>Cancel</button>
         </div>
       </div>
     )
