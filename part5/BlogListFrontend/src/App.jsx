@@ -6,6 +6,7 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 
 import "./App.css";
+import Togglable from "./components/Togglable";
 
 const Notification = ({ notification }) => {
   const { message, isError } = notification;
@@ -31,11 +32,8 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [notification, setNotification] = useState({ message: null });
-
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
-
+  const [newBlogVisible, setNewBlogVisible] = useState(false)
+  
   useEffect(() => {
     const loggedUserJson = window.localStorage.getItem("loggedBlogappUser");
     if (loggedUserJson) {
@@ -89,33 +87,39 @@ const App = () => {
     setTimeout(() => setNotification({ message: null }), 5000);
   };
 
-  const createNewBlog = async (event) => {
-    event.preventDefault();
-
-    const newBlog = {
-      title: title,
-      author: author,
-      url: url,
-    };
+  const createNewBlog = async (newBlog) => {
     const savedBlog = await blogService.createBlog(newBlog);
     if (savedBlog) {
       setBlogs(blogs.concat(savedBlog))
       notifyUser(`A new blog ${savedBlog.title} by ${savedBlog.author} added`)
     }
+    setNewBlogVisible(!newBlogVisible)
   };
+
+  const createNewBlogForm = () => {
+    const hideWhenVisible = { display: newBlogVisible ? 'none' : '' }
+    const showWhenVisible = { display: newBlogVisible ? '' : 'none' }
+
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setNewBlogVisible(!newBlogVisible)}>New blog</button>
+        </div>
+        <div style={showWhenVisible}>
+        <NewBlog createNewBlog={createNewBlog} />
+        <button onClick={() => setNewBlogVisible(!newBlogVisible)}>Cancel</button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
       <Header user={user} />
       <Notification notification={notification} />
       {user === null && (
-        <Login
-          userName={userName}
-          password={password}
-          setUserName={setUserName}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
+        <Login userName={userName} password={password} 
+          setUserName={setUserName} setPassword={setPassword} handleLogin={handleLogin} />
       )}
       {user !== null && (
         <div>
@@ -125,16 +129,8 @@ const App = () => {
               {" "}
               logout{" "}
             </button>
-          </p>
-          <NewBlog
-            title={title}
-            author={author}
-            url={url}
-            setTitle={setTitle}
-            setAuthor={setAuthor}
-            setUrl={setUrl}
-            createNewBlog={createNewBlog}
-          />
+          </p> 
+          {createNewBlogForm()}
           <br />
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
