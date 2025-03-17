@@ -3,10 +3,14 @@ h1 {
   font-style: italic;
 }
 
-.blog {
-  color: grey;
-  padding-top: 3px;
-  font-size: 15px;
+.blogStyle {
+  padding-top: 10px;
+  padding-left: 2px;
+  margin-bottom: 5px; 
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
+  border-color: darkgray;
 }
 
 .notification {

@@ -9,13 +9,11 @@ import "./App.css";
 
 const Notification = ({ notification }) => {
   const { message, isError } = notification;
-  
-  if (!message || message.length <= 0) 
-    return;
+
+  if (!message || message.length <= 0) return;
 
   return (
-    <div style={{ color: isError ? "red" : "green" }}
-      className="notification" >
+    <div style={{ color: isError ? "red" : "green" }} className="notification">
       {message}
     </div>
   );
@@ -31,8 +29,8 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [notification, setNotification] = useState({ message: null });
-  const [newBlogVisible, setNewBlogVisible] = useState(false)
-  
+  const [newBlogVisible, setNewBlogVisible] = useState(false);
+
   useEffect(() => {
     const loggedUserJson = window.localStorage.getItem("loggedBlogappUser");
     if (loggedUserJson) {
@@ -89,15 +87,26 @@ const App = () => {
   const createNewBlog = async (newBlog) => {
     const savedBlog = await blogService.createBlog(newBlog);
     if (savedBlog) {
-      setBlogs(blogs.concat(savedBlog))
-      notifyUser(`A new blog ${savedBlog.title} by ${savedBlog.author} added`)
+      setBlogs(blogs.concat(savedBlog));
+      notifyUser(`A new blog ${savedBlog.title} by ${savedBlog.author} added`);
     }
-    setNewBlogVisible(false)
+    setNewBlogVisible(false);
+  };
+
+  const updateLikes = async (updateBlog) => {
+    await blogService.updateBlog(updateBlog.id, updateBlog);
+  };
+
+  const deleteBlog = async (id) => {
+    const response = await blogService.deleteBlog(id);
+    if (response.status == 204) {
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+    }
   };
 
   const createNewBlogForm = () => {
-    const hideWhenVisible = { display: newBlogVisible ? 'none' : '' }
-    const showWhenVisible = { display: newBlogVisible ? '' : 'none' }
+    const hideWhenVisible = { display: newBlogVisible ? "none" : "" };
+    const showWhenVisible = { display: newBlogVisible ? "" : "none" };
 
     return (
       <div>
@@ -105,20 +114,27 @@ const App = () => {
           <button onClick={() => setNewBlogVisible(true)}>New blog</button>
         </div>
         <div style={showWhenVisible}>
-        <NewBlog createNewBlog={createNewBlog} />
-        <button onClick={() => setNewBlogVisible(false)}>Cancel</button>
+          <NewBlog createNewBlog={createNewBlog} />
+          <button onClick={() => setNewBlogVisible(false)}>Cancel</button>
         </div>
       </div>
-    )
-  }
+    );
+  };
+
+  blogs.sort((a, b) => a.likes - b.likes);
 
   return (
     <div>
       <Header user={user} />
       <Notification notification={notification} />
       {user === null && (
-        <Login userName={userName} password={password} 
-          setUserName={setUserName} setPassword={setPassword} handleLogin={handleLogin} />
+        <Login
+          userName={userName}
+          password={password}
+          setUserName={setUserName}
+          setPassword={setPassword}
+          handleLogin={handleLogin}
+        />
       )}
       {user !== null && (
         <div>
@@ -128,11 +144,17 @@ const App = () => {
               {" "}
               logout{" "}
             </button>
-          </p> 
+          </p>
           {createNewBlogForm()}
           <br />
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateLikes={updateLikes}
+              deleteBlog={deleteBlog}
+              user={user}
+            />
           ))}
         </div>
       )}
