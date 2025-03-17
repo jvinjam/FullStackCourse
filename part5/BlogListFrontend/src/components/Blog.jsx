@@ -39,8 +39,7 @@ const Blog = ({ blog, updateLikes, deleteBlog, user }) => {
           likes {blog.likes} <button onClick={increaseLikes}>likes</button>{" "}
         </div>
         <div>{blog.author}</div>
-        {/* Is this the correct way to check if the user is the owner of the blog? */}
-        {blog.author === user.name && (
+        {user.id === blog.user.id && (
           <button onClick={removeBlog}>Remove</button>
         )}
       </div>
