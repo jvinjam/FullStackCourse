@@ -3,8 +3,8 @@ import "../App.css";
 
 const Blog = ({ blog, updateLikes, deleteBlog, user }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const buttonLabel = showDetails ? "hide" : "view";
   const [likes, setLikes] = useState(blog.likes || 0);
+  const buttonLabel = showDetails ? "hide" : "view";
 
   const increaseLikes = () => {
     blog.likes = likes + 1;

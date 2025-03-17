@@ -29,7 +29,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [notification, setNotification] = useState({ message: null });
-  const [newBlogVisible, setNewBlogVisible] = useState(false);
+  const [newBlogFormVisible, setNewBlogFormVisible] = useState(false);
 
   useEffect(() => {
     const loggedUserJson = window.localStorage.getItem("loggedBlogappUser");
@@ -90,7 +90,7 @@ const App = () => {
       setBlogs(blogs.concat(savedBlog));
       notifyUser(`A new blog ${savedBlog.title} by ${savedBlog.author} added`);
     }
-    setNewBlogVisible(false);
+    setNewBlogFormVisible(false);
   };
 
   const updateLikes = async (updateBlog) => {
@@ -101,21 +101,23 @@ const App = () => {
     const response = await blogService.deleteBlog(id);
     if (response.status == 204) {
       setBlogs(blogs.filter((blog) => blog.id !== id));
+    } else {
+      notifyUser("Failed to delete the blog", true);
     }
   };
 
   const createNewBlogForm = () => {
-    const hideWhenVisible = { display: newBlogVisible ? "none" : "" };
-    const showWhenVisible = { display: newBlogVisible ? "" : "none" };
+    const hideWhenVisible = { display: newBlogFormVisible ? "none" : "" };
+    const showWhenVisible = { display: newBlogFormVisible ? "" : "none" };
 
     return (
       <div>
         <div style={hideWhenVisible}>
-          <button onClick={() => setNewBlogVisible(true)}>New blog</button>
+          <button onClick={() => setNewBlogFormVisible(true)}>New blog</button>
         </div>
         <div style={showWhenVisible}>
           <NewBlog createNewBlog={createNewBlog} />
-          <button onClick={() => setNewBlogVisible(false)}>Cancel</button>
+          <button onClick={() => setNewBlogFormVisible(false)}>Cancel</button>
         </div>
       </div>
     );
