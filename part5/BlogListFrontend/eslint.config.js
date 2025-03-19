@@ -24,6 +24,7 @@ export default [
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'vitest-globals': vitestGlobals,
     },
     rules: {
       ...js.configs.recommended.rules,
